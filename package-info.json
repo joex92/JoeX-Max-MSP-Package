@@ -1,0 +1,41 @@
+{
+	"author" : "Joe X",
+	"authors" : [  ],
+	"description" : "",
+	"displayname" : "",
+	"extends" : "",
+	"extensible" : 0,
+	"homepatcher" : "",
+	"max_version_max" : "none",
+	"max_version_min" : "6.1.10",
+	"name" : "JoeX",
+	"os" : 	{
+		"macintosh" : 		{
+			"platform" : [ "ia32", "x64" ],
+			"min_version" : "10.7.x"
+		}
+,
+		"windows" : 		{
+			"platform" : [ "ia32", "x64" ],
+			"min_version" : "7"
+		}
+
+	}
+,
+	"tags" : ["mxj", "js"],
+	"version" : "1.0",
+	"website" : "",
+	"filelist" : 	{
+		"patchers" : [],
+		"help" : [],
+		"java-classes" : ["joex/test1.java","joex/test1.class","joex/dft"],
+		"jsextensions" : ["joex-extensions.js"],
+		"jsui" : [],
+		"media" : [],
+		"javascript" : ["ColorConversionAlgorithms", "dft", "dftxy", "HSL2RGB"],
+		"extras" : []
+	}
+,
+	"c74install" : 1,
+	"installdate" : 20200414
+}
