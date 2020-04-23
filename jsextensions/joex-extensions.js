@@ -57,9 +57,6 @@ function joexUtils(){
 		if (fromsize < 0){
 			op = ((value/fromsize) * tosize) - to[0];
 		}
-		else if (tosize < 0){
-			op = to[0] - ((value/fromsize) * tosize);
-		}
 		else {
 			op = ((value/fromsize) * tosize) + to[0];
 		}
