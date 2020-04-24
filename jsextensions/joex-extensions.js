@@ -63,7 +63,7 @@ function joexUtils(){
 		return parseFloat(op);
 	}
 	
-	// copy method
+	// copy object method
 	this.copy = function(obj){
 		return JSON.parse(JSON.stringify(obj));
 	}
@@ -83,21 +83,56 @@ function joexUtils(){
 		return JSON.stringify(obj1) == JSON.stringify(obj2);
 	}
 
-	this.error = function(x)
-	{
-		var errorString = "• error: " + x.jsarguments[0] + ":";
-
-		// If the it's a string with a lenth of 1 -> it's strange...
-		// that means we passed a string to the function (and the length property refer to a string)
-		if (arguments.length > 2 && typeof(arguments[1]) == "string" && arguments[1].length == 1)
-			errorString += " " + arguments[1];
-		else {
-			for (var i = 1; i < arguments.length; i++)
-				errorString += " " + arguments[i];
+	// file exists method
+	this.fileExists = function(fp){
+		var file = new File(fp);
+		if(!file.isopen)
+		{
+		    post("\nFile "+fp+" doesn't exist.");
+			file.close();
+		    return false;
 		}
-
-		post(errorString + "\n");
+		else
+		{
+		    post("\nFile "+fp+" exists.");
+			file.close();
+		    return true;
+		}
 	}
+
+	// read file method
+	this.readFile = function(fp){
+		var file = new File(fp);
+		if(this.fileExists(fp)){
+			var i=0,line=file.readline(), content=[];
+			file.access = "read";
+			do{
+				content[i] = line;
+				i++;
+				line=file.readline();
+			}while(line != null);
+		}
+		else {
+		}
+		file.close();
+		return content; // returns content of file as a array of lines fo the file's content
+	}
+
+//	this.error = function(x)
+//	{
+//		var errorString = "• error: " + x.jsarguments[0] + ":";
+//
+//		// If the it's a string with a lenth of 1 -> it's strange...
+//		// that means we passed a string to the function (and the length property refer to a string)
+//		if (arguments.length > 2 && typeof(arguments[1]) == "string" && arguments[1].length == 1)
+//			errorString += " " + arguments[1];
+//		else {
+//			for (var i = 1; i < arguments.length; i++)
+//				errorString += " " + arguments[i];
+//		}
+//
+//		post(errorString + "\n");
+//	}
 	
 	return this;
 }

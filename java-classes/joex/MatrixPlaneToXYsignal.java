@@ -1,11 +1,13 @@
 package joex;
 import com.cycling74.jitter.*;
 import com.cycling74.msp.*;
+import java.lang.management.*;
 import java.util.*;
 public class MatrixPlaneToXYsignal extends MSPPerformer {
+	private static final int MEGABYTE = (1024*1024);
 	public static JitterMatrix jm;
 	public static String jms;
-	private static int OUTLETS = 5;
+	private static int OUTLETS = 4;
 	private static int[] OUTLETS_DECLARE,dim,diminit;
 	public static int[][] l,linit,lsnap;
 	private static boolean first=true;
@@ -13,10 +15,11 @@ public class MatrixPlaneToXYsignal extends MSPPerformer {
 	private static float v=0,vt=0;
 	private static float[][] scalefrom;
 	private static float[][] scaleto;
+    private static MemoryUsage heapUsage;
 	
 	public MatrixPlaneToXYsignal(int p) {
 		plane = p;
-		OUTLETS_DECLARE = new int[]{SIGNAL,SIGNAL,SIGNAL,SIGNAL,SIGNAL};
+		OUTLETS_DECLARE = new int[]{SIGNAL,SIGNAL,SIGNAL,SIGNAL};
 		declareInlets(new int[]{SIGNAL});
 		declareOutlets(OUTLETS_DECLARE);
 		setInletAssist(0, "(Signal) Input / Messages");
@@ -24,10 +27,42 @@ public class MatrixPlaneToXYsignal extends MSPPerformer {
 		setOutletAssist(1, "(Signal) Value");
 		setOutletAssist(2, "(Signal) X Signal");
 		setOutletAssist(3, "(Signal) Y Signal");
-		setOutletAssist(4, "(Signal) Length");
 		linit = new int[0][3];
 		diminit = new int[2];
 		clear();
+	}
+	
+	public void jit_matrix(String s){
+		try {
+			jms = s;
+			jm = new JitterMatrix(jms);
+			if (dim[0] != Arrays.copyOf(jm.getDim(), jm.getDim().length)[0] && dim[1] != Arrays.copyOf(jm.getDim(), jm.getDim().length)[1]) {
+				first = true;
+			}
+			if (first) {
+				dim = Arrays.copyOf(jm.getDim(), jm.getDim().length);
+				scalefrom = new float[][] {new float[] {0,dim[0]-1},new float[] {dim[1]-1,0}};
+				MatrixToArray(jm,l);
+				if (first){
+					first = false;
+				}
+				outlet(OUTLETS,dim);
+			}
+		}catch (Exception e) {
+			post("\n"+e.getMessage());
+        } catch (OutOfMemoryError e) {
+        	RAM();
+        } finally {}
+		
+	}
+	
+	public void RAM() {
+	    MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
+    	heapUsage = memoryBean.getHeapMemoryUsage();
+        long maxMemory = heapUsage.getMax() / MEGABYTE;
+        long usedMemory = heapUsage.getUsed() / MEGABYTE;
+        outlet(OUTLETS,new String[] {"RAM",usedMemory + "M",maxMemory + "M"});
+        post("Memory Use: " + usedMemory + "M/" + maxMemory + "M");
 	}
 	
 	public void clear() {
@@ -38,6 +73,19 @@ public class MatrixPlaneToXYsignal extends MSPPerformer {
 		lsnap = Arrays.stream(linit).map(int[]::clone).toArray(int[][]::new);
 		first = true;
 		post("Array cleared");
+	}
+	
+	private void MatrixToArray(JitterMatrix m,int[][] arr){
+		int[] mdim = Arrays.copyOf(m.getDim(), m.getDim().length);
+		arr = new int[mdim[0]*mdim[1]][3];
+		int i,j,k=0;
+		for (i = 0;i < mdim[0];i++) {
+			for (j = mdim[1]-1;j > -1;j--) {
+				arr[k] = new int[] {jm.getcell2dInt(i, j)[plane],i,j};
+				k++;
+			}
+		}
+		post("Array changed");
 	}
 	
 	private float lscale(float value,float[] from,float[] to) {
@@ -55,42 +103,6 @@ public class MatrixPlaneToXYsignal extends MSPPerformer {
 	
 	private float clip(float val,float min,float max){
 		return Math.min(Math.max(val,min),max);
-	}
-	
-	public void jit_matrix(String s){
-		try {
-			jms = s;
-			jm = new JitterMatrix(jms);
-			if (dim[0] != Arrays.copyOf(jm.getDim(), jm.getDim().length)[0] && dim[1] != Arrays.copyOf(jm.getDim(), jm.getDim().length)[1]) {
-				first = true;
-			}
-			dim = Arrays.copyOf(jm.getDim(), jm.getDim().length);
-			scalefrom = new float[][] {new float[] {0,dim[0]-1},new float[] {dim[1]-1,0}};
-			l = MatrixToArray(jm);
-			if (first) {
-				post("\nchanged");
-				if (first){
-					first = false;
-				}
-				outlet(OUTLETS,dim);
-			}
-		}catch (Exception e) {
-			post("\n"+e.getMessage());
-		} finally {}
-		
-	}
-	
-	private int[][] MatrixToArray(JitterMatrix m){
-		int[] mdim = Arrays.copyOf(m.getDim(), m.getDim().length);
-		int[][] arr = new int[mdim[0]*mdim[1]][3];
-		int i,j,k=0;
-		for (i = 0;i < mdim[0];i++) {
-			for (j = mdim[1]-1;j > -1;j--) {
-				arr[k] = new int[] {jm.getcell2dInt(i, j)[plane],i,j};
-				k++;
-			}
-		}
-		return arr;
 	}
 	
 	public void bang() {
@@ -112,7 +124,7 @@ public class MatrixPlaneToXYsignal extends MSPPerformer {
 	}
 	
 	public void inlet (int i) {
-		l = MatrixToArray(jm);
+		MatrixToArray(jm,l);
 		outlet(OUTLETS,l[i]);
 	}
 	
@@ -120,7 +132,7 @@ public class MatrixPlaneToXYsignal extends MSPPerformer {
 	public void perform(MSPSignal[] ins, MSPSignal[] outs)
 	{
 		int length,o,i,li=0;
-		length = dim[0]*dim[1];
+		length = l.length;
 		float[] in = ins[0].vec;
 		for (o = 1; o < OUTLETS - 1 ; o++) {
 			for(i = 0; i < in.length;i++) {
@@ -146,12 +158,6 @@ public class MatrixPlaneToXYsignal extends MSPPerformer {
 				}
 				v = vt;
 				outs[o].vec[i] = v;
-				if (length > 0) {
-					outs[OUTLETS-1].vec[i] = length;
-				}
-				else {
-					outs[OUTLETS-1].vec[i] = 0;
-				}
 			}
 		}
 	}
