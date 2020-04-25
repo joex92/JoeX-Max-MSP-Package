@@ -77,7 +77,7 @@ function add(c){
 	drawing[drawing.length] = joex.copy(l);
 }
 function list(){
-	var l = joex.ArrToi0obji1Num(arrayfromargs(messagename, arguments))[1];
+	var l = joex.arrayNumDelace(arrayfromargs(messagename, arguments))[1];
 	switch (inlet){
 		case 0:
 			if (l.length == 2){

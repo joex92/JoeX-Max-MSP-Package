@@ -1,23 +1,29 @@
 inlets=2
 outlets=2
 var args = joex.GetArgs(jsarguments)[1];
-var ratio, mv, rot;
-if (args.length == 5){
-    ratio = [args[0],args[1]];
-    mv = [args[2],args[3]];
-    rot = args[4];
+var scale, mv, rot;
+if (args.length > 0 && args.length < 5){
+	scale = args[0];
+	mv = [15,15];
+	rot = 0;
+	if(args.leng < 4){
+		mv = [args[1],args[2]];
+    }
+	else{
+	    rot = args[3];
+	}
 }
 else {
-	ratio = [1,1];
+	scale = 1;
 	mv = [15,15];
-	rot = Math.PI;
+	rot = 0;
 }
 var scalefrom = [[]],scaleto = [
-	[-1*ratio[0],1*ratio[0]],
-	[-1*ratio[1],1*ratio[1]]
+	[1*scale,-1*scale],
+	[1*scale,-1*scale]
 	];
 
-// Coding Challenge 130.3: Drawing with Fourier Transform and Epicycles
+// Taken from Coding Challenge 130.3: Drawing with Fourier Transform and Epicycles
 // Daniel Shiffman
 // https://thecodingtrain.com/CodingChallenges/130.1-fourier-transform-drawing.html
 // https://thecodingtrain.com/CodingChallenges/130.2-fourier-transform-drawing.html
@@ -5073,7 +5079,7 @@ function pol2car(dr){
     return cartesianCoor;
 }
 function rotate(R){
-	var pol,car;
+	var pol
 	for(m = 0;m < drawing.length;m++){
 		pol = car2pol(drawing[m]);
 		pol[1] = pol[1] + R;
@@ -5082,7 +5088,7 @@ function rotate(R){
 }
 
 function list(){
-	var l = joex.ArrToi0obji1Num(arrayfromargs(messagename, arguments))[1];
+	var l = joex.arrayNumDelace(arrayfromargs(messagename, arguments))[1];
 	switch (inlet){
 		case 0:
 			break;

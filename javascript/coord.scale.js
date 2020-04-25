@@ -42,7 +42,7 @@ function clear(){
 }
 
 function list(){
-	l = joex.ArrToi0obji1Num(arrayfromargs(arguments))[1];
+	l = joex.arrayNumDelace(arrayfromargs(arguments))[1];
 	switch (inlet) {
 	case 0:
 		if ((l.length > 1) && (l.length%2 == 0) && (l.length < 7)){

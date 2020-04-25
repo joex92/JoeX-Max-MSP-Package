@@ -1,37 +1,34 @@
+autowatch = 1
 inlets = 1
 outlets = 2
 
-function splitlist (l) {
-	var lab = new Array(2);
-	if ((l.length % 2)==0) {
-		var ia = 0;
-		var ib = 0;
-		var a = new Array();
-		var b = new Array();
-		for (var i = 0 ; i < l.length ; i++ ){
-			if ((i%2) == 0){
-				a[ia] = l[i];
-				ia++;
-			}
-			else {
-				b[ib] = l[i];
-				ib++;
-			}
-		}
-		lab[0] = a;
-		lab[1] = b;
+var args = joex.GetArgs(jsarguments)[1];
+if (args.length > 0){
+	outlets = args[0];
+	if (args.length > 1){
+		post("Only 1 numerical argument needed, taking first one.");
 	}
-	else {
-		lab[0] = [0];
-		lab[1] = [0];
+}
+var inl = new Array(outlets);
+
+function bang(){
+	for(i = outlets-1;i > -1;i--){
+		outlet(i,delacelist(inl,outlets)[i]);
 	}
-	return lab;
+}
+
+function delacelist (l,m) {
+	var dl = new Array(m);
+	for (i = 0;i < m;i++){
+		dl[i]=[];
+	}
+	for (i = 0;i < l.length;i++){
+		dl[i%m].push(l[i]);
+	}
+	return dl;
 }
 
 function list(){
-	var inl = arrayfromargs(arguments);
-	var x = splitlist(inl)[0];
-	var y = splitlist(inl)[1];
-	outlet(0,x)
-	outlet(1,y)
+	inl = arrayfromargs(messagename,arguments);
+	bang();
 }
