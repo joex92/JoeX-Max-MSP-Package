@@ -36,7 +36,7 @@ function joexUtils(){
 	
 	// post to max console with a line method
 	this.postln = function (val){
-		post(" "+val+'\n');
+		post(" "+val+"\n");
 	}
 	
 	// post an array to max console method
@@ -44,7 +44,7 @@ function joexUtils(){
 		/*debug*/if(this.debug){this.postln("joex.postarr debug:");this.postln(" arr: "+arr.join(" "));this.postln(" str: "+str);};/*debug*/
 		if(Array.isArray(arr)){
 			if(str == undefined){
-				str = '\n';
+				str = "\n";
 			}
 			for (i = 0;i < arr.length;i++){
 				if (!Array.isArray(str)){
@@ -162,13 +162,13 @@ function joexUtils(){
 			var file = new File(fp);
 			if(!file.isopen)
 			{
-			    this.postln("\nFile "+fp+" doesn't exist.");
+			    this.postln("File "+fp+" doesn't exist.");
 				file.close();
 			    return false;
 			}
 			else
 			{
-			    this.postln("\nFile "+fp+" found.");
+			    this.postln("File "+fp+" found.");
 				file.close();
 			    return true;
 			}
@@ -235,7 +235,7 @@ function joexUtils(){
 			fp = fp.toString();
 			if (this.isNumber(i)){
 				if (!Array.isArray(content)){
-					content = content.split('\n');
+					content = content.split("\n");
 				}
 				var read = this.readFile(fp);
 				for (c=0;c<content.length;c++){
@@ -356,7 +356,7 @@ function joexUtils(){
 			var k=0,content = this.readFile(fp);
 			for (i=0;i<content.length;i++){
 				for (j=0;j<find.length;j++){
-					if(find[j].split('\n').length == 1){
+					if(find[j].split("\n").length == 1){
 						if (content[i].search(find[j].toString()) != -1){
 							found[k] = [i,content[i].search(find[j].toString()),find[j]];
 							k++;
@@ -364,9 +364,9 @@ function joexUtils(){
 					}
 					else {
 						var temp="";	
-						while(i < (content.length - find[j].split('\n').length + 1)){
-							for (l=0;l<find[j].split('\n').length;l++){
-								temp = temp + content[i+l] + '\n'
+						while(i < (content.length - find[j].split("\n").length + 1)){
+							for (l=0;l<find[j].split("\n").length;l++){
+								temp = temp + content[i+l] + "\n"
 							}
 							if (temp.search(find[j].toString()) != -1){
 								found[k] = [i,temp.search(find[j].toString()),find[j]];
@@ -390,12 +390,12 @@ function joexUtils(){
 		if (!Array.isArray(fp)){
 			fp = fp.toString();
 			if (Array.isArray(find)){
-				find = find.join('\n');
+				find = find.join("\n");
 			}
 			if (Array.isArray(replace)){
-				replace = replace.join('\n');
+				replace = replace.join("\n");
 			}
-			var content = this.readFile(fp).join('\n');
+			var content = this.readFile(fp).join("\n");
 			return this.overwriteFile(fp,content.replace(new RegExp(find.toString(),"gi"),replace.toString()));
 		}
 		else{
@@ -406,13 +406,17 @@ function joexUtils(){
 
 	// replace a whole line in a file method
 	this.replaceLineInFile = function (fp,i,replace){
+		if (i = undefined){
+			i = -1;
+		}
 		if (!Array.isArray(fp)){
 			fp = fp.toString();
 			if (this.isNumber(i)){
 				if (Array.isArray(replace)){
-					replace = replace.join('\n');
+					replace = replace.join("\n");
 				}
 				var inBounds;
+				var content = this.readFile(fp);
 				if (i > -1 && i < content.length){
 					inBounds = true;
 				}
@@ -421,7 +425,12 @@ function joexUtils(){
 				}
 				if(inBounds){
 					var content = this.readFile(fp);
-					content.splice(i,1,replace.toString());
+					if (replace == undefined || replace == null){
+						content.splice(i,1);
+					}
+					else {
+						content.splice(i,1,replace.toString());
+					}
 					return this.overwriteFile(fp,content);
 				}
 				else {
@@ -439,22 +448,9 @@ function joexUtils(){
 			return false;
 		}
 	}
-
-//	this.error = function (x)
-//	{
-//		var errorString = "• error: " + x.jsarguments[0] + ":";
-//
-//		// If the it's a string with a lenth of 1 -> it's strange...
-//		// that means we passed a string to the function (and the length property refer to a string)
-//		if (arguments.length > 2 && typeof(arguments[1]) == "string" && arguments[1].length == 1)
-//			errorString += " " + arguments[1];
-//		else {
-//			for (var i = 1; i < arguments.length; i++)
-//				errorString += " " + arguments[i];
-//		}
-//
-//		this.postln(errorString + '\n');
-//	}
+	
+	// method to handle errors. still figuring it out.
+	this.err = function(){}
 	
 	return this;
 }
