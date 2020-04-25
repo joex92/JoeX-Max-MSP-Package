@@ -1,3 +1,4 @@
+/* NOT FINISHED */
 autowatch = 1
 inlets = 1
 outlets = 1
@@ -16,7 +17,7 @@ post(replaceLineInFile("asdf.txt",0,"asdf"));
 function clear(){
 	var c = joex.readFile(configfile);
 	var i = findInFile(configfile,jvm);
-	post(c[17]);
+	joex.postarr(c);
 	post(i.join("\n"));
 	while(c[i[0][0]]!=""){
 		c.splice(i[0][0],1);

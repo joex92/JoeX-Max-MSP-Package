@@ -1,5 +1,5 @@
 var joex = new joexUtils();
-post("\nJoeX js externals v1.5(2020/04)\n");
+joex.postln("JoeX js externals v1.6(2020/04)");
 
 function joexUtils(){
 
@@ -36,7 +36,7 @@ function joexUtils(){
 	
 	// post to max console with a line method
 	this.postln = function (val){
-		post(" "+val+"\n");
+		post(" "+val+'\n');
 	}
 	
 	// post an array to max console method
@@ -44,14 +44,14 @@ function joexUtils(){
 		/*debug*/if(this.debug){this.postln("joex.postarr debug:");this.postln(" arr: "+arr.join(" "));this.postln(" str: "+str);};/*debug*/
 		if(Array.isArray(arr)){
 			if(str == undefined){
-				str = "\n";
+				str = '\n';
 			}
 			for (i = 0;i < arr.length;i++){
 				if (!Array.isArray(str)){
-					post(" "+i+":["+arr[i]+"]"+str);
+					this.post(i+":["+arr[i]+"]"+str);
 				}
 				else {
-					post(" "+i+":["+arr[i]+"]\n")
+					this.post(i+":["+arr[i]+"]\n")
 				}
 			}
 		}
@@ -85,19 +85,17 @@ function joexUtils(){
 	    var marr = [[],[]];
 		if (Array.isArray(arr)){
 			/*debug*/if(this.debug){this.postarr(arr)};/*debug*/
-			if (arr.length > 1){
-				var i,j=0,k=0;
-				for (i = 0;i < arr.length;i++){
-					if (this.isNumber(arr[i])){
-				    	marr[1][j]= parseFloat(arr[i]);
-				    	j++;
-					}
-					else {
-				    	marr[0][k]= arr[i];
-				    	k++;
-					}
-			    } 
-			}
+			var i,j=0,k=0;
+			for (i = 0;i < arr.length;i++){
+				if (this.isNumber(arr[i])){
+			    	marr[1][j]= parseFloat(arr[i]);
+			    	j++;
+				}
+				else {
+			    	marr[0][k]= arr[i];
+			    	k++;
+				}
+		    } 
 		}
 		/*debug*/if(this.debug){this.postarr(marr[0]);this.postarr(marr[1]);};/*debug*/
 		return marr;
@@ -105,9 +103,9 @@ function joexUtils(){
 	
 	// get arguments from jsarguments to a 2 dimensional array method
 	this.GetArgs = function (jsargs){
-		/*debug*/if(this.debug){this.postln("joex.GetArgs debug:\n jsargs:");this.postarr(jsargs)};/*debug*/
+		/*debug*/if(this.debug){this.postln("joex.GetArgs debug:\njsargs:");this.postarr(jsargs)};/*debug*/
 		jsargs.splice(0,1);
-		/*debug*/if(this.debug){this.postln(" jsargs spliced:");this.postarr(jsargs)};/*debug*/
+		/*debug*/if(this.debug){this.postln("jsargs spliced:");this.postarr(jsargs)};/*debug*/
 		return this.arrayNumDelace(jsargs);
 	}
 	
@@ -128,7 +126,7 @@ function joexUtils(){
 			return parseFloat(op);
 		}
 		else {
-			post("Wrong parameter(s) given to joex.lscale");
+			this.postln("Wrong parameter(s) given to joex.lscale");
 			return value;
 		}
 	});
@@ -141,7 +139,7 @@ function joexUtils(){
 			return Math.min(Math.max(value,min),max);
 		}
 		else {
-			post("Wrong parameter(s) given to joex.clip");
+			this.postln("Wrong parameter(s) given to joex.clip.");
 			return value;t
 		}
 	});
@@ -164,19 +162,19 @@ function joexUtils(){
 			var file = new File(fp);
 			if(!file.isopen)
 			{
-			    post("\nFile "+fp+" doesn't exist.");
+			    this.postln("\nFile "+fp+" doesn't exist.");
 				file.close();
 			    return false;
 			}
 			else
 			{
-			    post("\nFile "+fp+" found.");
+			    this.postln("\nFile "+fp+" found.");
 				file.close();
 			    return true;
 			}
 		}
 		else{
-			post("Invalid filepath value");
+			this.postln("Invalid filepath value.");
 			return false;
 		}
 	}
@@ -195,7 +193,7 @@ function joexUtils(){
 			}
 		}
 		catch (err){
-			post(err.message);
+			this.postln(err.message);
 			return false;
 		}
 		finally {
@@ -226,7 +224,7 @@ function joexUtils(){
 			return content; // returns content of file as a string array of file's content's lines
 		}
 		else{
-			post("Invalid filepath value");
+			this.postln("Invalid filepath value.");
 			return content;
 		}
 	}
@@ -237,7 +235,7 @@ function joexUtils(){
 			fp = fp.toString();
 			if (this.isNumber(i)){
 				if (!Array.isArray(content)){
-					content = content.split("\n");
+					content = content.split('\n');
 				}
 				var read = this.readFile(fp);
 				for (c=0;c<content.length;c++){
@@ -253,12 +251,12 @@ function joexUtils(){
 				}
 			}
 			else {
-				post("Invalid line index value.");
+				this.postln("Invalid line index value.");
 				return false;
 			}
 		}
 		else{
-			post("Invalid filepath value");
+			this.postln("Invalid filepath value.");
 			return false;
 		}
 	}
@@ -288,13 +286,13 @@ function joexUtils(){
 				written = false;
 			}
 			if (!written){
-				post("Could not write content to file.");
+				this.postln("Could not write content to file.");
 			}
 			file.close();
 			return written;
 		}
 		else{
-			post("Invalid filepath value");
+			this.postln("Invalid filepath value.");
 			return false;
 		}
 	}
@@ -308,7 +306,7 @@ function joexUtils(){
 			return this.overwrite(fpdest,source);
 		}
 		else{
-			post("Invalid filepath value");
+			this.postln("Invalid filepath value.");
 			return false;
 		}
 	}
@@ -325,7 +323,7 @@ function joexUtils(){
 			}
 		}
 		else{
-			post("Invalid filepath value");
+			this.postln("Invalid filepath value.");
 			return false;
 		}
 	}
@@ -342,7 +340,7 @@ function joexUtils(){
 			}
 		}
 		else{
-			post("Invalid filepath value");
+			this.postln("Invalid filepath value.");
 			return false;
 		}
 	}
@@ -358,7 +356,7 @@ function joexUtils(){
 			var k=0,content = this.readFile(fp);
 			for (i=0;i<content.length;i++){
 				for (j=0;j<find.length;j++){
-					if(find[j].split("\n").length == 1){
+					if(find[j].split('\n').length == 1){
 						if (content[i].search(find[j].toString()) != -1){
 							found[k] = [i,content[i].search(find[j].toString()),find[j]];
 							k++;
@@ -366,9 +364,9 @@ function joexUtils(){
 					}
 					else {
 						var temp="";	
-						while(i < (content.length - find[j].split("\n").length + 1)){
-							for (l=0;l<find[j].split("\n").length;l++){
-								temp = temp + content[i+l] + "\n"
+						while(i < (content.length - find[j].split('\n').length + 1)){
+							for (l=0;l<find[j].split('\n').length;l++){
+								temp = temp + content[i+l] + '\n'
 							}
 							if (temp.search(find[j].toString()) != -1){
 								found[k] = [i,temp.search(find[j].toString()),find[j]];
@@ -382,7 +380,7 @@ function joexUtils(){
 			return found;
 		}
 		else{
-			post("Invalid filepath value");
+			this.postln("Invalid filepath value.");
 			return found;
 		}
 	}
@@ -392,16 +390,16 @@ function joexUtils(){
 		if (!Array.isArray(fp)){
 			fp = fp.toString();
 			if (Array.isArray(find)){
-				find = find.join("\n");
+				find = find.join('\n');
 			}
 			if (Array.isArray(replace)){
-				replace = replace.join("\n");
+				replace = replace.join('\n');
 			}
-			var content = this.readFile(fp).join("\n");
+			var content = this.readFile(fp).join('\n');
 			return this.overwriteFile(fp,content.replace(new RegExp(find.toString(),"gi"),replace.toString()));
 		}
 		else{
-			post("Invalid filepath value");
+			this.postln("Invalid filepath value.");
 			return false;
 		}
 	}
@@ -412,7 +410,7 @@ function joexUtils(){
 			fp = fp.toString();
 			if (this.isNumber(i)){
 				if (Array.isArray(replace)){
-					replace = replace.join("\n");
+					replace = replace.join('\n');
 				}
 				var inBounds;
 				if (i > -1 && i < content.length){
@@ -427,17 +425,17 @@ function joexUtils(){
 					return this.overwriteFile(fp,content);
 				}
 				else {
-					post("Line index value out of bounds");
+					this.postln("Line index value out of bounds.");
 					return false;
 				}
 			}
 			else {
-				post("Invalid line index value.");
+				this.postln("Invalid line index value.");
 				return false;
 			}
 		}
 		else{
-			post("Invalid filepath value");
+			this.postln("Invalid filepath value.");
 			return false;
 		}
 	}
@@ -455,7 +453,7 @@ function joexUtils(){
 //				errorString += " " + arguments[i];
 //		}
 //
-//		post(errorString + "\n");
+//		this.postln(errorString + '\n');
 //	}
 	
 	return this;
