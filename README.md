@@ -3,6 +3,9 @@ This is a Package for Max/MSP that I'm developing for some music projects for my
 
 I'll complete the Readme.md file when I finish the first release with full info about the contents...
 
+#### Updates
+I'm constantly making changes, so keep in mind that it may be possible that you download this and minutes or even seconds later I updated something, for now I'm updating almost daily...
+
 ### Installing
 for now if you want to install it, just:
 1. Clone this project or download it as zip and decompress it
