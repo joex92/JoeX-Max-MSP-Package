@@ -1,15 +1,21 @@
+/* ALMOST FINISHED
+ * the idea of this object is to add incoming lists to an array of lists (array of arrays),
+ * and then output them in the same order as separated signals,
+ * so you initialize it with, at least, the amount of outlets you'll need.
+ * */
+
 package joex;
 import java.util.Arrays;
 import com.cycling74.msp.*;
 
-public class listArray extends MSPPerformer {
+public class list2collarr extends MSPPerformer {
 	public static float[][] l;
 	private static float[][] linit;
 	private static boolean tidle,_idle,_debug;
 	private static int OUTLETS, MAX_LENGTH;
 	private static int[] OUTLETS_DECLARE;
 	
-	public listArray (int outlets, int maxlength) {
+	public list2collarr (int outlets, int maxlength) {
 		_debug = false;
 		declareInlets(new int[]{SIGNAL});
 		MAX_LENGTH = 0;

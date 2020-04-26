@@ -1,3 +1,9 @@
+/* ALMOST FINISHED
+ * like the list2collarr file, this one instead of taking lists,
+ * it takes a matrix plane and convert it to an array of arrays
+ * and output it as signal.
+ * */
+
 package joex;
 import com.cycling74.jitter.*;
 import com.cycling74.msp.*;

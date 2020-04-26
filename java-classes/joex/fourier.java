@@ -1,3 +1,10 @@
+/* NOT ENTIRELY FINISHED 
+ * I'm trying to implement DFT algorithm, but the result is not quite what I need.
+ * I'm trying to do this: https://youtu.be/7_vKzcgpfvU but drawing on an Oscilloscope
+ * Apparently when I do the recursive sum on the epicycles function, it doesn't quite do it,
+ * I don't know if it's too fast for the code to process it.
+ * */
+
 package joex;
 import java.util.*;
 import com.cycling74.msp.*;
