@@ -12,7 +12,9 @@ for now if you want to install it, just:
 2. Move the *master* folder to the Max packages folder, which is located at: [your User's Document folder]/Max [#]/Packages/
 3. Finally open Max, and try the *js* and *mxj~* files...
 
-you can also check up my [jsextensions](jsextensions/joex-extensions.js), which are very useful for creating your own js objects, You can use this to toggle debugging on most of my jsextensions:
+you can also check up my [jsextensions](jsextensions/joex-extensions.js), which are very useful for creating your own js objects
+
+You can use this on a patch to toggle debugging on most of my jsextensions:
 
 ```
 ----------begin_max5_patcher----------
