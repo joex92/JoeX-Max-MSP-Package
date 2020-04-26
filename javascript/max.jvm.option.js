@@ -45,10 +45,13 @@ function bang(){
 
 function anything(){
 	args = joex.arrayNumDelace(arrayfromargs(messagename, arguments))[0];
-	for (i = 0;i < args.length;i++){
+	var i = 0;
+	do{
 		if(args[i].charAt(0) != '-'){
 			args.splice(i,1);
 			post(args[i]+" incorrect argument, ignoring it.");
+			i--;
 		}
-	}
+	}while (i++ < args.length);
+	bang();
 }
