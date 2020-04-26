@@ -53,5 +53,6 @@ function anything(){
 			i--;
 		}
 	}while (i++ < args.length);
+	joex.postarr(args);
 	bang();
 }
