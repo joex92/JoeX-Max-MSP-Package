@@ -1,5 +1,5 @@
 var joex = new joexUtils();
-joex.postln("JoeX js externals v1.6(2020/04)");
+joex.postln("JoeX jsexternals v0.66⍺(2020/04)");
 
 function joexUtils(){
 
@@ -140,7 +140,7 @@ function joexUtils(){
 		}
 		else {
 			this.postln("Wrong parameter(s) given to joex.clip.");
-			return value;t
+			return value;
 		}
 	});
 	
@@ -203,13 +203,13 @@ function joexUtils(){
 
 	// read file method
 	this.readFile = function (fp){
+		/*debug*/if(this.debug){this.postln("joex.readFile debug:");this.postln(" "+fp);};/*debug*/
 		var content = [];
 		if (!Array.isArray(fp)){
 			fp = fp.toString();
 			var file = new File(fp);
 			if(this.fileExists(fp)){
 				var i=0,line=file.readline(), content=[];
-//				file.type = "TEXT";
 				file.access = "read";
 				do{
 					content[i] = line;
@@ -221,25 +221,28 @@ function joexUtils(){
 				return content;
 			}
 			file.close();
-			return content; // returns content of file as a string array of file's content's lines
 		}
 		else{
 			this.postln("Invalid filepath value.");
-			return content;
 		}
+		/*debug*/if(this.debug){this.postarr(content)};/*debug*/
+		return content; // returns content of file as a string array of file's content's lines
 	}
 	
 	// write to a file's content line method
 	this.writeFile = function (fp,i,content){
 		if (!Array.isArray(fp)){
 			fp = fp.toString();
-			if (this.isNumber(i)){
+			if (i == undefined){
+				i = -1;
+			}
+			if (this.isNumber(i) && Number(i) > -1){
 				if (!Array.isArray(content)){
 					content = content.split("\n");
 				}
 				var read = this.readFile(fp);
 				for (c=0;c<content.length;c++){
-					if (read.length <= i){
+					if ((i+1) > read.length){
 						for (e=read.length;e<i;e++){
 							read[e]="";
 						}
@@ -251,7 +254,7 @@ function joexUtils(){
 				}
 			}
 			else {
-				this.postln("Invalid line index value.");
+				this.postln("Invalid line index value or out of bounds.");
 				return false;
 			}
 		}
@@ -265,30 +268,33 @@ function joexUtils(){
 	this.overwriteFile = function (fp,content){
 		if (!Array.isArray(fp)){
 			fp = fp.toString();
-			var file = new File(fp);
-			var written = true;
-			if(this.fileExists(fp)){
-				file.access = "readwrite";
-				file.open(fp);
-				if (Array.isArray(content)){
-					for (i = 0;i < content.length;i++){
-						written = written && file.writeline(content[i].toString());
+			var written = false;
+			if (content != undefined){
+				var file = new File(fp);
+				written = true;
+				if(this.fileExists(fp)){
+					file.access = "readwrite";
+					file.open(fp);
+					if (Array.isArray(content)){
+						for (i = 0;i < content.length;i++){
+							written = written && file.writeline(content[i].toString());
+						}
+						file.eof = file.position; 
 					}
-					file.eof = file.position; 
+					else{
+						written = file.writeline(content);
+						file.eof = file.position;
+					}
+					
 				}
-				else{
-					written = file.writeline(content);
-					file.eof = file.position;
+				else {
+					written = false;
 				}
-				
-			}
-			else {
-				written = false;
+				file.close();
 			}
 			if (!written){
 				this.postln("Could not write content to file.");
 			}
-			file.close();
 			return written;
 		}
 		else{
@@ -303,10 +309,13 @@ function joexUtils(){
 			fpsource = fpsource.toString();
 			fpdest = fpdest.toString();
 			var source = this.readFile(fpsource);
+			if (!this.fileExists(fpdest)){
+				createFile(fpdest);
+			}
 			return this.overwrite(fpdest,source);
 		}
 		else{
-			this.postln("Invalid filepath value.");
+			this.postln("Invalid filepath(s) value(s).");
 			return false;
 		}
 	}
@@ -315,11 +324,17 @@ function joexUtils(){
 	this.appendToFile = function (fp,content){
 		if (!Array.isArray(fp)){
 			fp = fp.toString();
-			if (Array.isArray(content)){
-				return this.overwriteFile(fp,this.readFile(fp).concat(content));
+			if (content != undefined){
+				if (Array.isArray(content)){
+					return this.overwriteFile(fp,this.readFile(fp).concat(content));
+				}
+				else {
+					return this.overwriteFile(fp,this.readFile(fp).join("\n")+content);
+				}
 			}
 			else {
-				return this.overwriteFile(fp,this.readFile(fp).concat([content]));
+				this.postln("No content to prepend given.");
+				return false;
 			}
 		}
 		else{
@@ -332,11 +347,17 @@ function joexUtils(){
 	this.prependToFile = function (fp,content){
 		if (!Array.isArray(fp)){
 			fp = fp.toString();
-			if (Array.isArray(content)){
-				return this.overwriteFile(fp,content.concat(this.readFile(fp)));
+			if (content != undefined){
+				if (Array.isArray(content)){
+					return this.overwriteFile(fp,content.concat(this.readFile(fp)));
+				}
+				else {
+					return this.overwriteFile(fp,content+this.readFile(fp).join("\n"));
+				}
 			}
 			else {
-				return this.overwriteFile(fp,[content].concat(this.readFile(fp)));
+				this.postln("No content to prepend given.");
+				return false;
 			}
 		}
 		else{
@@ -350,32 +371,37 @@ function joexUtils(){
 		var found = [[]];
 		if (!Array.isArray(fp)){
 			fp = fp.toString();
-			if (!Array.isArray(find)){
-				find = [find];
-			}
-			var k=0,content = this.readFile(fp);
-			for (i=0;i<content.length;i++){
-				for (j=0;j<find.length;j++){
-					if(find[j].split("\n").length == 1){
-						if (content[i].search(find[j].toString()) != -1){
-							found[k] = [i,content[i].search(find[j].toString()),find[j]];
-							k++;
-						}
-					}
-					else {
-						var temp="";	
-						while(i < (content.length - find[j].split("\n").length + 1)){
-							for (l=0;l<find[j].split("\n").length;l++){
-								temp = temp + content[i+l] + "\n"
-							}
-							if (temp.search(find[j].toString()) != -1){
-								found[k] = [i,temp.search(find[j].toString()),find[j]];
+			if (find != undefined){
+				if (!Array.isArray(find)){
+					find = [find];
+				}
+				var k=0,content = this.readFile(fp);
+				for (i=0;i<content.length;i++){
+					for (j=0;j<find.length;j++){
+						if(find[j].split("\n").length == 1){
+							if (content[i].search(find[j].toString()) != -1){
+								found[k] = [i,content[i].search(find[j].toString()),find[j]];
 								k++;
 							}
-							
+						}
+						else {
+							var temp="";	
+							while(i < (content.length - find[j].split("\n").length + 1)){
+								for (l=0;l<find[j].split("\n").length;l++){
+									temp = temp + content[i+l] + "\n"
+								}
+								if (temp.search(find[j].toString()) != -1){
+									found[k] = [i,temp.search(find[j].toString()),find[j]];
+									k++;
+								}
+								
+							}
 						}
 					}
 				}
+			}
+			else {
+				this.postln("Invalid value given to find.");
 			}
 			return found;
 		}
@@ -389,14 +415,20 @@ function joexUtils(){
 	this.replaceStrInFile = function (fp,find,replace){
 		if (!Array.isArray(fp)){
 			fp = fp.toString();
-			if (Array.isArray(find)){
-				find = find.join("\n");
+			if (find != undefined && replace != undefined){
+				if (Array.isArray(find)){
+					find = find.join("\n");
+				}
+				if (Array.isArray(replace)){
+					replace = replace.join("\n");
+				}
+				var content = this.readFile(fp).join("\n");
+				return this.overwriteFile(fp,content.replace(new RegExp(find.toString(),"gi"),replace.toString()));
 			}
-			if (Array.isArray(replace)){
-				replace = replace.join("\n");
+			else {
+				this.postln("Nothing to find and/or replace.");
+				return false;
 			}
-			var content = this.readFile(fp).join("\n");
-			return this.overwriteFile(fp,content.replace(new RegExp(find.toString(),"gi"),replace.toString()));
 		}
 		else{
 			this.postln("Invalid filepath value.");
@@ -425,7 +457,7 @@ function joexUtils(){
 				}
 				if(inBounds){
 					var content = this.readFile(fp);
-					if (replace == undefined || replace == null){
+					if (replace == undefined || replace == null){ // if replace value is left blank or sent null, then it deletes the line
 						content.splice(i,1);
 					}
 					else {
