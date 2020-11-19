@@ -23,7 +23,7 @@ updateMaxJVMop("test."+configfile+".txt",defargs);
 
 function updateMaxJVMop(fp,arg){
 	var c = joex.readFile(fp);
-	var i = findInFile(fp,jvm);
+	var i = joex.findInFile(fp,jvm);
 	joex.postarr(c);
 	joex.postarr(i);
 	for(j=0;j<i.length;j++){
@@ -40,7 +40,7 @@ function msg_int(i){
 }
 
 function bang(){
-	// updates jvm options on max config file. still to implement.
+	// updates jvm options on max config file. yet to implement.
 }
 
 function anything(){

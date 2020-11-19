@@ -8,8 +8,9 @@ package joex;
 import com.cycling74.jitter.*;
 import com.cycling74.msp.*;
 import java.lang.management.*;
+import java.lang.reflect.Method;
 import java.util.*;
-public class MatrixPlaneToXYsignal extends MSPPerformer {
+public class MatrixPlaneToXYsignal extends MSPObject {
 	private static final int MEGABYTE = (1024*1024);
 	public static JitterMatrix jm;
 	public static String jms;
@@ -18,11 +19,19 @@ public class MatrixPlaneToXYsignal extends MSPPerformer {
 	public static int[][] l,linit,lsnap;
 	private static boolean first=true;
 	private static int plane=0;
-	private static float v=0,vt=0;
+	private static float v=0,vt=0,TWO_PI=(float)(Math.PI*2);
 	private static float[][] scalefrom;
 	private static float[][] scaleto;
     private static MemoryUsage heapUsage;
-	
+	public float freq = 0.f;
+	public float phase = 0.f;
+	private int L; //table length
+	private double _sr;//sampling rate
+	private float _index;//current index
+	private float _inc;//current increment
+	private Method _p0 = null;
+	private Method _p1 = null;
+    
 	public MatrixPlaneToXYsignal(int p) {
 		plane = p;
 		OUTLETS_DECLARE = new int[]{SIGNAL,SIGNAL,SIGNAL,SIGNAL};
@@ -48,7 +57,7 @@ public class MatrixPlaneToXYsignal extends MSPPerformer {
 			if (first) {
 				dim = Arrays.copyOf(jm.getDim(), jm.getDim().length);
 				scalefrom = new float[][] {new float[] {0,dim[0]-1},new float[] {dim[1]-1,0}};
-				MatrixToArray(jm,l);
+				MatrixPlaneToArray(jm,l);
 				if (first){
 					first = false;
 				}
@@ -79,9 +88,11 @@ public class MatrixPlaneToXYsignal extends MSPPerformer {
 		lsnap = Arrays.stream(linit).map(int[]::clone).toArray(int[][]::new);
 		first = true;
 		post("Array cleared");
+		_p0 = getPerformMethod("p0");
+		_p1 = getPerformMethod("p1");
 	}
 	
-	private void MatrixToArray(JitterMatrix m,int[][] arr){
+	private void MatrixPlaneToArray(JitterMatrix m,int[][] arr){
 		int[] mdim = Arrays.copyOf(m.getDim(), m.getDim().length);
 		arr = new int[mdim[0]*mdim[1]][3];
 		int i,j,k=0;
@@ -130,13 +141,36 @@ public class MatrixPlaneToXYsignal extends MSPPerformer {
 	}
 	
 	public void inlet (int i) {
-		MatrixToArray(jm,l);
+		MatrixPlaneToArray(jm,l);
 		outlet(OUTLETS,l[i]);
 	}
+
+	public Method dsp(MSPSignal[] ins, MSPSignal[] outs) {
+		_sr = outs[0].sr;
+		_inc = (float) (freq * L / _sr); 		
+		if(ins[0].connected){
+			return _p1;
+		}
+		else
+			return _p0;
+	}
 	
-	@Override
-	public void perform(MSPSignal[] ins, MSPSignal[] outs)
-	{
+	public void p0(MSPSignal[] ins, MSPSignal[] outs) {
+		int i;
+		float[] outX = outs[2].vec;
+		float[] outY = outs[3].vec;
+		float p_offset = phase * (L - 1);
+
+		for(i = 0; i < outX.length;i++)
+		{
+			outX[i] = (float)(Math.cos(((_index*TWO_PI)/(outX.length - 1))+p_offset));
+			outY[i] = (float)(Math.sin(((_index*TWO_PI)/(outY.length - 1))+p_offset));	
+			_index += _inc;
+		}
+		_index %= L;
+	}
+	
+	public void p1(MSPSignal[] ins, MSPSignal[] outs) {
 		int length,o,i,li=0;
 		length = l.length;
 		float[] in = ins[0].vec;
@@ -166,5 +200,14 @@ public class MatrixPlaneToXYsignal extends MSPPerformer {
 				outs[o].vec[i] = v;
 			}
 		}
+	}
+	
+	public void perform(MSPSignal[] ins, MSPSignal[] outs){
+		p0(ins,outs);
+	}
+
+	public void dspsetup(MSPSignal[] ins, MSPSignal[] outs)
+	{
+		dsp(ins,outs);
 	}
 }

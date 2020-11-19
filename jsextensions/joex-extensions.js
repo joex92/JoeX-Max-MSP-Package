@@ -310,9 +310,9 @@ function joexUtils(){
 			fpdest = fpdest.toString();
 			var source = this.readFile(fpsource);
 			if (!this.fileExists(fpdest)){
-				createFile(fpdest);
+				this.createFile(fpdest);
 			}
-			return this.overwrite(fpdest,source);
+			return this.overwriteFile(fpdest,source);
 		}
 		else{
 			this.postln("Invalid filepath(s) value(s).");

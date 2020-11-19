@@ -1,18 +1,19 @@
 /* TESTING FILE */
 
 package joex;
+
+import java.lang.reflect.Method;
 import com.cycling74.msp.*;
 
-public class testmsp extends MSPPerformer
-{
-	private float _out = 0;
+public class testmsp extends MSPObject{
 	
 	private static final String[] INLET_ASSIST = new String[]{
 		"input (sig)"
 	};
 	private static final String[] OUTLET_ASSIST = new String[]{
-		"output (sig)"
+		"output X (sig)","output Y (sig)"
 	};
+	private static float TWO_PI=(float)(Math.PI*2);
 	
 
 	public testmsp(float sel)
@@ -22,44 +23,31 @@ public class testmsp extends MSPPerformer
 
 		setInletAssist(INLET_ASSIST);
 		setOutletAssist(OUTLET_ASSIST);
-
-		_out = sel;
 	}
 
-	public void inlet(int i) {
-		inlet((float) i);
-	}
-	
-	public void inlet(float f)
-	{
-		switch (getInlet()) {
-			case 0:
-				_out = f;
-				break;
-			default:
-				post("err");
-				break;
-		}
-	}
 
-	public void dspsetup(MSPSignal[] ins, MSPSignal[] outs)
-	{
-		//If you forget the fields of MSPSignal you can select the classname above
-		//and choose Open Class Reference For Selected Class.. from the Java menu
-	}
-
-	public void perform(MSPSignal[] ins, MSPSignal[] outs)
-	{
-		
+	public void perform(MSPSignal[] ins, MSPSignal[] outs) {
 		int i;
-		float[] in = ins[0].vec;
-		float[] out = outs[(int)_out].vec;
-		for(i = 0; i < in.length;i++)
-		{
-			/*do something*/
-			out[i] = in[i];  	
-
+		float[] outX = outs[0].vec;
+		float[] outY = outs[1].vec;
+		for(i = 0; i < outX.length;i++){
+			if (!ins[0].connected) {
+					outX[i] = (float)i;//(Math.cos(((i*TWO_PI)/(outX.length - 1))+0));
+					outY[i] = (float)i;//(Math.sin(((i*TWO_PI)/(outY.length - 1))+0));
+			}
+			else {
+				outX[i]=ins[0].vec[i];
+				outX[i]=ins[0].vec[i]*-1;
+			}
 		}
+		
+	}
+
+
+	@Override
+	public Method dsp(MSPSignal[] inlets, MSPSignal[] outlets) {
+		perform(inlets,outlets);
+		return null;
 	}
 }
 
