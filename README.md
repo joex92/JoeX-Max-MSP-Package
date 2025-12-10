@@ -8,7 +8,7 @@ I'm constantly making changes, so keep in mind that it may be possible that you 
 
 ### Installing
 for now if you want to install it, just:
-1. Clone this project directly on the `Packages` folder or download it as zip and decompress it
+1. Clone this project directly in the `~/Documents/Max [8|9]/Packages` folder or download it as zip and decompress it there.
 2. Move the *master* folder to the Max packages folder, which is located at: [your User's Document folder]/Max [version]/Packages/
 3. Finally open Max, and happy patching!
 
